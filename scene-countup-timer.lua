@@ -1,5 +1,5 @@
 obs = obslua
-gversion = 0.4
+gversion = 0.5
 gdebug = 0
 
 gcur_seconds = 0
@@ -87,9 +87,9 @@ end
 -- Update the user-defined Note Display source
 function updateNote()
 	--logIt('updateNote', "")
+	sleep(.01)
 	updateTextSource(gnote_target, "")
 	local sources = obs.obs_enum_sources()
-	local noteFound = false
 
 	if sources ~= nil then
 		for _, source in ipairs(sources) do
@@ -105,15 +105,10 @@ function updateNote()
 						msg_text = obs.obs_data_get_string(settings, "text")
 						updateTextSource(gnote_target, msg_text)
 						noteFound = true
-						logIt('Update Note', msg_text)
-
+						logIt('updateNote:text', msg_text)
 						obs.obs_data_release(settings)
 						break
 					end
-				end
-
-				if not noteFound then
-					updateTextSource(gnote_target, "")
 				end
 
 			end
@@ -122,11 +117,18 @@ function updateNote()
 
 	obs.source_list_release(sources)
 end
+
+function sleep (a)
+    local sec = tonumber(os.clock() + a);
+    while (os.clock() < sec) do
+    end
+end
+
 ----------------------------------------------------------
 function onFrontendEvent(event)
 	logIt('in onFrontendEvent', event)
 
-	if event == obs.OBS_FRONTEND_EVENT_SCENE_CHANGED then
+	if event == obs.OBS_FRONTEND_EVENT_SCENE_CHANGED then --8
 		local sceneSrc = obs.obs_frontend_get_current_scene()
 		local scene = obs.obs_source_get_name(sceneSrc)
 		obs.obs_source_release(sceneSrc)
@@ -138,7 +140,7 @@ function onFrontendEvent(event)
 		updateTextSource(gprogram_text_source, scene)
 		updateNote()
 
-	elseif event == obs.OBS_FRONTEND_EVENT_PREVIEW_SCENE_CHANGED then
+	elseif event == obs.OBS_FRONTEND_EVENT_PREVIEW_SCENE_CHANGED then --24
 		local sceneSrc = obs.obs_frontend_get_current_preview_scene()
 		local scene = obs.obs_source_get_name(sceneSrc)
 		obs.obs_source_release(sceneSrc)
@@ -146,7 +148,6 @@ function onFrontendEvent(event)
 
 		updateTextSource(gpreview_text_source, scene)
 	end
-
 
 end
 
