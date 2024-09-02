@@ -14,6 +14,9 @@ gnote_prefix = ""
 ----------------------------------------------------------
 -- Formatted logging messages
 local function logIt(name, msg)
+	if gdebug == 0 then
+		return
+	end
 
 	if msg ~= nil then
 		msg = " > " .. tostring(msg)
@@ -21,9 +24,7 @@ local function logIt(name, msg)
 		msg = ""
 	end
 
-	if gdebug == 1 then
-		obs.script_log(obs.LOG_gdebug, name .. msg)
-	end
+	obs.script_log(obs.LOG_gdebug, name .. msg)
 end
 
 ----------------------------------------------------------
@@ -55,7 +56,7 @@ end
 
 ----------------------------------------------------------
 function getTimeText()
-	--logIt('in setTimeText')
+	-- logIt('in setTimeText')
 
 	local seconds 			= math.floor(gcur_seconds % 60)
 	local total_minutes	= math.floor(gcur_seconds / 60)
@@ -69,7 +70,7 @@ end
 
 ----------------------------------------------------------
 function timer_callback()
-	--logIt('in timer_callback')
+	-- logIt('in timer_callback')
 
 	gcur_seconds = gcur_seconds + 1
 	local msg_text = getTimeText()
@@ -86,8 +87,8 @@ end
 ----------------------------------------------------------
 -- Update the user-defined Note Display source
 function updateNote()
-	--logIt('updateNote', "")
-	sleep(.01)
+	-- logIt('updateNote', "")
+	sleep(.05)
 	updateTextSource(gnote_target, "")
 	local sources = obs.obs_enum_sources()
 
@@ -105,7 +106,7 @@ function updateNote()
 						msg_text = obs.obs_data_get_string(settings, "text")
 						updateTextSource(gnote_target, msg_text)
 						noteFound = true
-						logIt('updateNote:text', msg_text)
+						-- logIt('updateNote:text', msg_text)
 						obs.obs_data_release(settings)
 						break
 					end
@@ -126,13 +127,13 @@ end
 
 ----------------------------------------------------------
 function onFrontendEvent(event)
-	logIt('in onFrontendEvent', event)
+	-- logIt('in onFrontendEvent', event)
 
 	if event == obs.OBS_FRONTEND_EVENT_SCENE_CHANGED then --8
 		local sceneSrc = obs.obs_frontend_get_current_scene()
 		local scene = obs.obs_source_get_name(sceneSrc)
 		obs.obs_source_release(sceneSrc)
-		logIt('    current_scene', scene)
+		-- logIt('    current_scene', scene)
 
 		gcur_seconds = 0
 		local msg_text = getTimeText()
@@ -144,7 +145,7 @@ function onFrontendEvent(event)
 		local sceneSrc = obs.obs_frontend_get_current_preview_scene()
 		local scene = obs.obs_source_get_name(sceneSrc)
 		obs.obs_source_release(sceneSrc)
-		logIt('    preview_scene', scene)
+		-- logIt('    preview_scene', scene)
 
 		updateTextSource(gpreview_text_source, scene)
 	end
